@@ -5,8 +5,13 @@ import { OrdersClient } from "./orders-client";
 
 export default async function ZleceniaPage() {
   const session = await auth();
-  const userId = session!.user.id;
-  const role = session!.user.role;
+  
+  if (!session?.user) {
+    return null;
+  }
+  
+  const userId = session.user.id;
+  const role = session.user.role;
 
   const isManager = role === "ADMIN" || role === "BIURO";
 

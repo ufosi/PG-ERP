@@ -5,8 +5,13 @@ import { ProductionClient } from "./production-client";
 
 export default async function ProductionPage() {
   const session = await auth();
-  const userId = session!.user.id;
-  const role = session!.user.role;
+  
+  if (!session?.user) {
+    return null;
+  }
+  
+  const userId = session.user.id;
+  const role = session.user.role;
   const manager = isManager(role);
 
   const [orders, categories] = await Promise.all([

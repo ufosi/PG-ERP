@@ -5,7 +5,12 @@ import { CustomersClient } from "./customers-client";
 
 export default async function KlienciPage() {
   const session = await auth();
-  const role = session!.user.role;
+  
+  if (!session?.user) {
+    return null;
+  }
+  
+  const role = session.user.role;
 
   if (role !== "ADMIN" && role !== "BIURO") {
     redirect("/dashboard");

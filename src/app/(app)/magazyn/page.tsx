@@ -5,7 +5,12 @@ import { ModulePage } from "@/components/module-page";
 
 export default async function WarehousePage() {
   const session = await auth();
-  if (session!.user.role === "PRACOWNIK") {
+  
+  if (!session?.user) {
+    return null;
+  }
+  
+  if (session.user.role === "PRACOWNIK") {
     redirect("/produkcja");
   }
 
