@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { isManager } from "@/types/roles";
@@ -6,13 +5,8 @@ import { ProductionClient } from "./production-client";
 
 export default async function ProductionPage() {
   const session = await auth();
-  
-  if (!session?.user) {
-    redirect("/login");
-  }
-  
-  const userId = session.user.id;
-  const role = session.user.role;
+  const userId = session!.user.id;
+  const role = session!.user.role;
   const manager = isManager(role);
 
   const [orders, categories] = await Promise.all([
