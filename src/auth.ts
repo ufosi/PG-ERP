@@ -29,19 +29,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const parsedCredentials = loginSchema.safeParse(credentials);
 
         if (!parsedCredentials.success) {
+          console.error("[auth] invalid credentials payload", parsedCredentials.error.flatten());
           return null;
         }
 
         const { pin, rfid } = parsedCredentials.data;
+        console.error("[auth] credentials received", { pinLength: pin.length, hasRfid: Boolean(rfid) });
         const users = await prisma.user.findMany({
           where: {
             active: true,
             ...(rfid ? { rfid } : {}),
           },
         });
+        console.error("[auth] active users found", users.length);
 
         for (const user of users) {
           const pinMatches = await bcrypt.compare(pin, user.pinHash);
+          console.error("[auth] pin check", { userId: user.id, role: user.role, pinMatches });
 
           if (pinMatches) {
             await prisma.user.update({
