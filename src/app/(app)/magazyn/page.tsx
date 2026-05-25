@@ -7,7 +7,7 @@ export default async function WarehousePage() {
   const session = await auth();
   
   if (!session?.user) {
-    return null;
+    redirect("/login");
   }
   
   if (session.user.role === "PRACOWNIK") {

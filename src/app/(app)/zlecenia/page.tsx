@@ -7,7 +7,7 @@ export default async function ZleceniaPage() {
   const session = await auth();
   
   if (!session?.user) {
-    return null;
+    redirect("/login");
   }
   
   const userId = session.user.id;

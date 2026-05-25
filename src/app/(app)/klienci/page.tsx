@@ -7,7 +7,7 @@ export default async function KlienciPage() {
   const session = await auth();
   
   if (!session?.user) {
-    return null;
+    redirect("/login");
   }
   
   const role = session.user.role;

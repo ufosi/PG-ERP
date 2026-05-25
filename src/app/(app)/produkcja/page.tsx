@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { isManager } from "@/types/roles";
@@ -7,7 +8,7 @@ export default async function ProductionPage() {
   const session = await auth();
   
   if (!session?.user) {
-    return null;
+    redirect("/login");
   }
   
   const userId = session.user.id;
