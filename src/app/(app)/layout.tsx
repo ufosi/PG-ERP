@@ -1,14 +1,9 @@
-import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 import { AppSidebar } from "@/components/app-sidebar";
-import { auth } from "@/auth";
+import { requireUserSession } from "@/lib/auth-session";
 
 export default async function AppLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/login");
-  }
+  const session = await requireUserSession();
 
   return (
     <div className="flex min-h-screen bg-slate-950">
