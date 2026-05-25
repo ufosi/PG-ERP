@@ -16,20 +16,12 @@ export function LoginForm() {
     setPending(true);
 
     const formData = new FormData(event.currentTarget);
-    const result = await signIn("credentials", {
+    await signIn("credentials", {
       pin: formData.get("pin"),
       rfid: formData.get("rfid"),
-      redirect: false,
+      redirect: true,
+      callbackUrl: "/dashboard",
     });
-
-    setPending(false);
-
-    if (result?.error) {
-      setError("Nieprawidłowy PIN lub RFID.");
-      return;
-    }
-
-    window.location.href = "/dashboard";
   }
 
   return (
