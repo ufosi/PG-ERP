@@ -1,39 +1,16 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useActionState } from "react";
 import { KeyRound, Radio } from "lucide-react";
-import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { loginAction } from "./actions";
 
 export function LoginForm() {
-  const [error, setError] = useState<string>();
-  const [pending, setPending] = useState(false);
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError(undefined);
-    setPending(true);
-
-    const formData = new FormData(event.currentTarget);
-    const result = await signIn("credentials", {
-      pin: formData.get("pin"),
-      rfid: formData.get("rfid"),
-      redirect: false,
-    });
-
-    setPending(false);
-
-    if (result?.error) {
-      setError("Nieprawidłowy PIN lub RFID.");
-      return;
-    }
-
-    window.location.href = "/dashboard";
-  }
+  const [error, formAction, pending] = useActionState(loginAction, undefined);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form action={formAction} className="space-y-5">
       <div className="space-y-2">
         <label className="text-sm font-medium text-slate-200" htmlFor="pin">
           PIN operatora
