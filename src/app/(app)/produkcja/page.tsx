@@ -1,12 +1,12 @@
-import { auth } from "@/auth";
+import { requireUserSession } from "@/lib/auth-session";
 import { prisma } from "@/lib/prisma";
 import { isManager } from "@/types/roles";
 import { ProductionClient } from "./production-client";
 
 export default async function ProductionPage() {
-  const session = await auth();
-  const userId = session!.user.id;
-  const role = session!.user.role;
+  const session = await requireUserSession();
+  const userId = session.user.id;
+  const role = session.user.role;
   const manager = isManager(role);
 
   const [orders, categories] = await Promise.all([

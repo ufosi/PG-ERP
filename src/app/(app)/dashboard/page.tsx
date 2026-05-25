@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Activity, AlertTriangle, Briefcase, ClipboardList, Clock, Factory, PlayCircle, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { auth } from "@/auth";
+import { requireUserSession } from "@/lib/auth-session";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, formatDuration } from "@/lib/time";
 import { isManager } from "@/types/roles";
@@ -51,9 +51,9 @@ function StatCard({
 }
 
 export default async function DashboardPage() {
-  const session = await auth();
-  const userId = session!.user.id;
-  const role = session!.user.role;
+  const session = await requireUserSession();
+  const userId = session.user.id;
+  const role = session.user.role;
   const manager = isManager(role);
 
   if (manager) {
