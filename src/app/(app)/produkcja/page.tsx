@@ -8,7 +8,7 @@ export default async function ProductionPage() {
   const session = await auth();
   
   if (!session?.user) {
-    return <div>No session found - session is null</div>;
+    redirect("/login");
   }
   
   const userId = session.user.id;
