@@ -7,7 +7,7 @@ Nowoczesny szkielet aplikacji ERP/MES dla firmy produkcyjnej.
 - Next.js 15
 - TypeScript
 - TailwindCSS
-- PostgreSQL
+- SQLite (lokalnie) / PostgreSQL (produkcja)
 - Prisma ORM
 - Auth.js / NextAuth v5
 - shadcn/ui-style components
@@ -22,7 +22,67 @@ Nowoczesny szkielet aplikacji ERP/MES dla firmy produkcyjnej.
 - Dashboard po zalogowaniu
 - Prisma schema pod dalszy rozwój
 
-## Uruchomienie
+## Praca na dwóch komputerach
+
+### Na nowym komputerze
+
+1. Sklonuj repozytorium:
+
+```bash
+git clone https://github.com/ufosi/PG-ERP.git
+cd PG-ERP
+```
+
+2. Zainstaluj zależności:
+
+```bash
+npm install
+```
+
+3. Skopiuj konfigurację środowiska:
+
+```bash
+cp .env.example .env
+```
+
+4. Uruchom migrację i seed:
+
+```bash
+npm run prisma:migrate
+npm run db:seed
+```
+
+5. Uruchom aplikację:
+
+```bash
+npm run dev
+```
+
+### Synchronizacja zmian między komputerami
+
+Przed rozpoczęciem pracy na komputerze:
+
+```bash
+git pull
+```
+
+Po zakończeniu pracy:
+
+```bash
+git add .
+git commit -m "opis zmian"
+git push
+```
+
+Na drugim komputerze przed kontynuacją:
+
+```bash
+git pull
+```
+
+**Ważne:** `.env` i baza danych SQLite (`prisma/dev.db`) są w `.gitignore`, więc każde środowisko ma swoją własną konfigurację i bazę.
+
+## Uruchomienie (pierwszy raz)
 
 1. Zainstaluj zależności:
 
@@ -36,18 +96,25 @@ npm install
 cp .env.example .env
 ```
 
-3. Ustaw `DATABASE_URL` oraz bezpieczny `AUTH_SECRET` w pliku `.env`.
-
-4. Uruchom migrację i seed:
+3. Uruchom migrację i seed:
 
 ```bash
 npm run prisma:migrate
 npm run db:seed
 ```
 
-5. Uruchom aplikację:
+4. Uruchom aplikację:
 
 ```bash
+npm run dev
+```
+
+Aplikacja będzie dostępna na `http://localhost:3000`.
+
+## Uruchomienie (codziennie)
+
+```bash
+git pull
 npm run dev
 ```
 
