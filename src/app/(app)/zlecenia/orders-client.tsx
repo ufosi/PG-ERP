@@ -423,7 +423,7 @@ function OrderCard({
           <div className="flex shrink-0 flex-col items-end gap-2">
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <CalendarDays className="h-3.5 w-3.5" />
-              Termin zakończenia: {formatDate(order.dueDate ? new Date(order.dueDate) : null)}
+              Termin realizacji: {formatDate(order.dueDate ? new Date(order.dueDate) : null)}
             </div>
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <CalendarDays className="h-3.5 w-3.5" />
@@ -486,7 +486,7 @@ function OrderCard({
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-slate-400">Przewidywany termin zakończenia</label>
+                <label className="text-xs text-slate-400">Termin realizacji</label>
                 <Input
                   type="date"
                   name="dueDate"
@@ -759,11 +759,6 @@ function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, on
   const [customerQuery, setCustomerQuery] = useState(initialCustomer?.name ?? "");
   const [customerSuggestions, setCustomerSuggestions] = useState<CustomerSuggestion[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Partial<CustomerSuggestion> | null>(initialCustomer ?? null);
-  const [receivedDate, setReceivedDate] = useState(new Date().toISOString().slice(0, 10));
-
-  const defaultDueDate = new Date(receivedDate);
-  defaultDueDate.setDate(defaultDueDate.getDate() + 14);
-  const defaultDueDateStr = defaultDueDate.toISOString().slice(0, 10);
 
   useEffect(() => {
     if (customerQuery.trim().length < 2) {
@@ -883,18 +878,12 @@ function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, on
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-slate-400">Przewidywany termin zakończenia</label>
-            <Input name="dueDate" type="date" defaultValue={defaultDueDateStr} className="bg-slate-950" />
+            <label className="text-xs text-slate-400">Termin realizacji</label>
+            <Input name="dueDate" type="date" className="bg-slate-950" />
           </div>
           <div className="space-y-1">
             <label className="text-xs text-slate-400">Data przyjęcia</label>
-            <Input 
-              name="receivedDate" 
-              type="date" 
-              value={receivedDate}
-              onChange={(e) => setReceivedDate(e.target.value)}
-              className="bg-slate-950" 
-            />
+            <Input name="receivedDate" type="date" defaultValue={new Date().toISOString().slice(0, 10)} className="bg-slate-950" />
           </div>
           <div className="space-y-1">
             <label className="text-xs text-slate-400">Kolor</label>
