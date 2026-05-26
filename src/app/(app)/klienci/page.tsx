@@ -27,7 +27,6 @@ export default async function KlienciPage() {
           number: true,
           name: true,
           status: true,
-          workflow: true,
           dueDate: true,
           price: true,
           materialCost: true,

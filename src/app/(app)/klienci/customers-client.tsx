@@ -14,7 +14,6 @@ type CustomerOrder = {
   number: string;
   name: string;
   status: string;
-  workflow: string;
   dueDate: Date | null;
   price: number | null;
   materialCost: number | null;
@@ -144,7 +143,7 @@ export function CustomersClient({ customers }: { customers: Customer[] }) {
       customer.city,
       customer.country,
       customer.notes,
-      ...customer.orders.flatMap((order) => [order.number, order.name, order.status, order.workflow]),
+      ...customer.orders.flatMap((order) => [order.number, order.name, order.status]),
     ].filter(Boolean).some((value) => String(value).toLowerCase().includes(normalized)));
   }, [customers, query]);
 
@@ -195,7 +194,7 @@ export function CustomersClient({ customers }: { customers: Customer[] }) {
                   <div className="space-y-2">
                     {customer.orders.length === 0 ? <div className="rounded-lg border border-slate-800 bg-slate-950 p-3 text-sm text-slate-500">Brak zleceń.</div> : customer.orders.map((order) => (
                       <Link key={order.id} href={`/zlecenia?order=${order.id}`} className="block rounded-lg border border-slate-800 bg-slate-950 p-3 transition hover:border-emerald-500/40">
-                        <div className="flex flex-wrap items-center justify-between gap-2"><div className="font-medium">#{order.number} · {order.name}</div><div className="text-xs text-slate-500">{order.workflow === "SIMPLE" ? "Prosty" : "Rozszerzone"}</div></div>
+                        <div className="font-medium">#{order.number} · {order.name}</div>
                         <div className="mt-1 text-xs text-slate-500">{order.dueDate ? `Termin: ${formatDate(order.dueDate)}` : `Utworzono: ${formatDate(order.createdAt)}`}{order.price !== null ? ` · Cena: ${order.price.toFixed(2)} zł` : ""}</div>
                       </Link>
                     ))}
