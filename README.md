@@ -2,6 +2,24 @@
 
 Nowoczesny szkielet aplikacji ERP/MES dla firmy produkcyjnej.
 
+## INSTRUKCJA DLA AI
+
+**ZAWSZE przed rozpoczęciem pracy nad kodem na tym projekcie:**
+
+```bash
+git pull
+```
+
+**ZAWSZE po zakończeniu pracy nad kodem:**
+
+```bash
+git add .
+git commit -m "opis zmian"
+git push
+```
+
+To jest krytyczne dla pracy na dwóch komputerach. Projekt jest rozwijany na dwóch maszynach, więc AI musi synchronizować zmiany przed i po każdej sesji pracy.
+
 ## Stack
 
 - Next.js 15
@@ -21,6 +39,63 @@ Nowoczesny szkielet aplikacji ERP/MES dla firmy produkcyjnej.
 - Sidebar przygotowany pod moduły ERP/MES
 - Dashboard po zalogowaniu
 - Prisma schema pod dalszy rozwój
+
+## Instalacja od zera na nowym komputerze
+
+Jeśli na komputerze nie ma nic (brak Node.js, Git, itp.):
+
+### 1. Zainstaluj Node.js
+
+Pobierz i zainstaluj: https://nodejs.org/ (LTS wersja)
+
+Sprawdź instalację:
+```bash
+node --version
+npm --version
+```
+
+### 2. Zainstaluj Git
+
+Pobierz i zainstaluj: https://git-scm.com/
+
+Sprawdź instalację:
+```bash
+git --version
+```
+
+### 3. Sklonuj repozytorium
+
+```bash
+git clone https://github.com/ufosi/PG-ERP.git
+cd PG-ERP
+```
+
+### 4. Zainstaluj zależności
+
+```bash
+npm install
+```
+
+### 5. Skonfiguruj środowisko
+
+```bash
+cp .env.example .env
+```
+
+### 6. Uruchom migrację i seed
+
+```bash
+npm run prisma:migrate
+npm run db:seed
+```
+
+### 7. Uruchom aplikację
+
+```bash
+npm run dev
+```
+
+Aplikacja będzie dostępna na `http://localhost:3000`.
 
 ## Praca na dwóch komputerach
 
