@@ -42,7 +42,6 @@ type Order = {
   customerRef: { id: string; name: string; phone: string | null; email: string | null } | null;
   description: string | null;
   category: Category | null;
-  workflow: string;
   color: string | null;
   photos: string | null;
   price: number | null;
@@ -392,9 +391,6 @@ function OrderCard({
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-mono text-sm text-slate-400">#{order.number}</span>
               <StatusBadge status={order.status} />
-              <span className="inline-flex rounded-full bg-indigo-500/10 px-2.5 py-0.5 text-xs font-medium text-indigo-300 ring-1 ring-indigo-500/30">
-                {order.workflow === "SIMPLE" ? "Prosty" : "Rozszerzone"}
-              </span>
               {hasLongRunning && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs font-medium text-amber-300 ring-1 ring-amber-500/30" title="Trwające odbicie dłuższe niż 12h">
                   <AlertTriangle className="h-3 w-3" />
@@ -467,13 +463,6 @@ function OrderCard({
               <div className="space-y-1">
                 <label className="text-xs text-slate-400">Nazwa *</label>
                 <Input name="name" defaultValue={order.name} required className="bg-slate-900" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400">Workflow</label>
-                <select name="workflow" defaultValue={order.workflow} className="h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                  <option value="SIMPLE">Prosty</option>
-                  <option value="EXTENDED">Rozszerzone</option>
-                </select>
               </div>
               <div className="space-y-1">
                 <label className="text-xs text-slate-400">Klient</label>
@@ -767,7 +756,6 @@ function OrderCard({
 
 function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, onDone }: { workers: Worker[]; categories: Category[]; serviceOptions: ServiceOption[]; initialCustomer?: Partial<CustomerSuggestion>; onDone: () => void }) {
   const [pending, startTransition] = useTransition();
-  const [workflow, setWorkflow] = useState<"SIMPLE" | "EXTENDED">("SIMPLE");
   const [customerQuery, setCustomerQuery] = useState(initialCustomer?.name ?? "");
   const [customerSuggestions, setCustomerSuggestions] = useState<CustomerSuggestion[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Partial<CustomerSuggestion> | null>(initialCustomer ?? null);
@@ -819,18 +807,6 @@ function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, on
             <Input name="name" required placeholder="np. Obudowa aluminiowa serii X" className="bg-slate-950" />
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-slate-400">Workflow</label>
-            <select
-              name="workflow"
-              value={workflow}
-              onChange={(e) => setWorkflow(e.target.value as "SIMPLE" | "EXTENDED")}
-              className="h-10 w-full rounded-md border border-slate-700 bg-slate-950 px-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            >
-              <option value="SIMPLE">Prosty</option>
-              <option value="EXTENDED">Rozszerzone</option>
-            </select>
-          </div>
-          <div className="space-y-1">
             <label className="text-xs text-slate-400">Klient</label>
             <div className="relative">
               <Input
@@ -861,38 +837,34 @@ function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, on
               )}
             </div>
           </div>
-          {workflow === "SIMPLE" && (
-            <>
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400">Telefon klienta</label>
-                <Input key={`phone-${selectedCustomer?.id ?? "new"}`} name="customerPhone" defaultValue={selectedCustomer?.phone ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400">Email klienta</label>
-                <Input key={`email-${selectedCustomer?.id ?? "new"}`} name="customerEmail" type="email" defaultValue={selectedCustomer?.email ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400">NIP</label>
-                <Input key={`tax-${selectedCustomer?.id ?? "new"}`} name="customerTaxId" defaultValue={selectedCustomer?.taxId ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400">Ulica / adres</label>
-                <Input key={`street-${selectedCustomer?.id ?? "new"}`} name="customerStreet" defaultValue={selectedCustomer?.street ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400">Kod pocztowy</label>
-                <Input key={`postal-${selectedCustomer?.id ?? "new"}`} name="customerPostalCode" defaultValue={selectedCustomer?.postalCode ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400">Miasto</label>
-                <Input key={`city-${selectedCustomer?.id ?? "new"}`} name="customerCity" defaultValue={selectedCustomer?.city ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400">Kraj</label>
-                <Input key={`country-${selectedCustomer?.id ?? "new"}`} name="customerCountry" defaultValue={selectedCustomer?.country ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
-              </div>
-            </>
-          )}
+          <div className="space-y-1">
+            <label className="text-xs text-slate-400">Telefon klienta</label>
+            <Input key={`phone-${selectedCustomer?.id ?? "new"}`} name="customerPhone" defaultValue={selectedCustomer?.phone ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs text-slate-400">Email klienta</label>
+            <Input key={`email-${selectedCustomer?.id ?? "new"}`} name="customerEmail" type="email" defaultValue={selectedCustomer?.email ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs text-slate-400">NIP</label>
+            <Input key={`tax-${selectedCustomer?.id ?? "new"}`} name="customerTaxId" defaultValue={selectedCustomer?.taxId ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs text-slate-400">Ulica / adres</label>
+            <Input key={`street-${selectedCustomer?.id ?? "new"}`} name="customerStreet" defaultValue={selectedCustomer?.street ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs text-slate-400">Kod pocztowy</label>
+            <Input key={`postal-${selectedCustomer?.id ?? "new"}`} name="customerPostalCode" defaultValue={selectedCustomer?.postalCode ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs text-slate-400">Miasto</label>
+            <Input key={`city-${selectedCustomer?.id ?? "new"}`} name="customerCity" defaultValue={selectedCustomer?.city ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs text-slate-400">Kraj</label>
+            <Input key={`country-${selectedCustomer?.id ?? "new"}`} name="customerCountry" defaultValue={selectedCustomer?.country ?? ""} placeholder="opcjonalnie" className="bg-slate-950" />
+          </div>
           <div className="space-y-1">
             <label className="text-xs text-slate-400">Kategoria</label>
             <select

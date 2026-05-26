@@ -71,7 +71,6 @@ model ProductionOrder {
   customerRef Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
   description String?
   status      String    @default("OPEN")
-  workflow    String    @default("EXTENDED")
   color       String?
   photos      String?
   price       Float?
@@ -96,7 +95,6 @@ model ProductionOrder {
   workLogs    WorkLog[]
 
   @@index([status])
-  @@index([workflow])
   @@index([dueDate])
   @@index([categoryId])
   @@index([customerId])
