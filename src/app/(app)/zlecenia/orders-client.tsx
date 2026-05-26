@@ -48,10 +48,12 @@ type Order = {
   price: number | null;
   materialCost: number | null;
   projectDetails: string | null;
-  comments: string | null;
+  productionComments: string | null;
+  officeComments: string | null;
   status: string;
   workerCanComplete: boolean;
   dueDate: Date | null;
+  receivedDate: Date | null;
   createdAt: Date;
   createdBy: { name: string };
   closedAt: Date | null;
@@ -428,6 +430,10 @@ function OrderCard({
               Termin: {formatDate(order.dueDate ? new Date(order.dueDate) : null)}
             </div>
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
+              <CalendarDays className="h-3.5 w-3.5" />
+              Przyjęto: {formatDate(order.receivedDate ? new Date(order.receivedDate) : null)}
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <Clock className="h-3.5 w-3.5" />
               Suma: <TotalTime logs={order.workLogs} />
             </div>
@@ -499,6 +505,15 @@ function OrderCard({
                   className="bg-slate-900"
                 />
               </div>
+              <div className="space-y-1">
+                <label className="text-xs text-slate-400">Data przyjęcia</label>
+                <Input
+                  type="date"
+                  name="receivedDate"
+                  defaultValue={order.receivedDate ? new Date(order.receivedDate).toISOString().slice(0, 10) : ""}
+                  className="bg-slate-900"
+                />
+              </div>
               <div className="space-y-1 sm:col-span-2">
                 <label className="text-xs text-slate-400">Operacje technologiczne</label>
                 <div className="grid gap-2 sm:grid-cols-2">
@@ -525,11 +540,29 @@ function OrderCard({
                 <Input name="materialCost" type="number" step="0.01" defaultValue={order.materialCost ?? ""} className="bg-slate-900" />
               </div>
               <div className="space-y-1 sm:col-span-2">
-                <label className="text-xs text-slate-400">Opis / uwagi</label>
+                <label className="text-xs text-slate-400">Opis</label>
                 <textarea
                   name="description"
                   rows={2}
                   defaultValue={order.description ?? ""}
+                  className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+              <div className="space-y-1 sm:col-span-2">
+                <label className="text-xs text-slate-400">Uwagi na produkcję</label>
+                <textarea
+                  name="productionComments"
+                  rows={2}
+                  defaultValue={order.productionComments ?? ""}
+                  className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+              <div className="space-y-1 sm:col-span-2">
+                <label className="text-xs text-slate-400">Uwagi na biuro</label>
+                <textarea
+                  name="officeComments"
+                  rows={2}
+                  defaultValue={order.officeComments ?? ""}
                   className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
@@ -560,9 +593,23 @@ function OrderCard({
             </div>
           </form>
         ) : (
-          order.description && (
-            <p className="text-sm text-slate-400">{order.description}</p>
-          )
+          <>
+            {order.description && (
+              <p className="text-sm text-slate-400">{order.description}</p>
+            )}
+            {order.productionComments && (
+              <div className="mt-2 rounded-lg border border-emerald-800/40 bg-emerald-950/30 p-3">
+                <div className="text-xs font-medium text-emerald-300">Uwagi na produkcję</div>
+                <p className="mt-1 text-sm text-slate-300">{order.productionComments}</p>
+              </div>
+            )}
+            {(role === "ADMIN" || role === "BIURO") && order.officeComments && (
+              <div className="mt-2 rounded-lg border border-blue-800/40 bg-blue-950/30 p-3">
+                <div className="text-xs font-medium text-blue-300">Uwagi na biuro</div>
+                <p className="mt-1 text-sm text-slate-300">{order.officeComments}</p>
+              </div>
+            )}
+          </>
         )}
 
         {canManage && (
@@ -863,6 +910,10 @@ function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, on
             <Input name="dueDate" type="date" className="bg-slate-950" />
           </div>
           <div className="space-y-1">
+            <label className="text-xs text-slate-400">Data przyjęcia</label>
+            <Input name="receivedDate" type="date" defaultValue={new Date().toISOString().slice(0, 10)} className="bg-slate-950" />
+          </div>
+          <div className="space-y-1">
             <label className="text-xs text-slate-400">Kolor</label>
             <Input name="color" placeholder="np. RAL 9005" className="bg-slate-950" />
           </div>
@@ -886,11 +937,29 @@ function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, on
             <Input name="materialCost" type="number" step="0.01" className="bg-slate-950" />
           </div>
           <div className="space-y-1 sm:col-span-2">
-            <label className="text-xs text-slate-400">Opis / uwagi</label>
+            <label className="text-xs text-slate-400">Opis</label>
             <textarea
               name="description"
               rows={2}
-              placeholder="Opcjonalne uwagi do zlecenia..."
+              placeholder="Opcjonalny opis zlecenia..."
+              className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <label className="text-xs text-slate-400">Uwagi na produkcję</label>
+            <textarea
+              name="productionComments"
+              rows={2}
+              placeholder="Uwagi dla działu produkcji..."
+              className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <label className="text-xs text-slate-400">Uwagi na biuro</label>
+            <textarea
+              name="officeComments"
+              rows={2}
+              placeholder="Uwagi dla biura..."
               className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>

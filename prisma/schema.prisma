@@ -77,11 +77,13 @@ model ProductionOrder {
   price       Float?
   materialCost Float?
   projectDetails String?
-  comments    String?
+  productionComments String?
+  officeComments String?
   workerCanComplete Boolean @default(false)
   categoryId  String?
   category    ProductionOrderCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   dueDate     DateTime?
+  receivedDate DateTime  @default(now())
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   createdById String
@@ -98,6 +100,7 @@ model ProductionOrder {
   @@index([dueDate])
   @@index([categoryId])
   @@index([customerId])
+  @@index([receivedDate])
 }
 
 model ProductionOrderCategory {
