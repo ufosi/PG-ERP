@@ -879,11 +879,11 @@ function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, on
           </div>
           <div className="space-y-1">
             <label className="text-xs text-slate-400">Termin realizacji</label>
-            <Input name="dueDate" type="date" className="bg-slate-950" />
+            <Input name="dueDate" type="date" className="bg-slate-950 z-10" />
           </div>
           <div className="space-y-1">
             <label className="text-xs text-slate-400">Data przyjęcia</label>
-            <Input name="receivedDate" type="date" defaultValue={new Date().toISOString().slice(0, 10)} className="bg-slate-950" />
+            <Input name="receivedDate" type="date" defaultValue={new Date().toISOString().slice(0, 10)} className="bg-slate-950 z-10" />
           </div>
           <div className="space-y-1">
             <label className="text-xs text-slate-400">Kolor</label>
