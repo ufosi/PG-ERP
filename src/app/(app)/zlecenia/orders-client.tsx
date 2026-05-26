@@ -2,6 +2,9 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
+import { format, parseISO } from "date-fns";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
 import { AlertTriangle, CalendarDays, CheckCircle2, ChevronDown, ChevronUp, ClipboardList, Clock, Pencil, Plus, RotateCcw, Save, Square, Trash2, User, X } from "lucide-react";
 import { createProductionOrder, deleteProductionOrder, deleteWorkLog, forceStopWorkLog, setOrderStatus, stopWorkLog, updateOrderAssignees, updateProductionOrder, updateWorkLog } from "./actions";
 import { Button } from "@/components/ui/button";
@@ -759,6 +762,10 @@ function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, on
   const [customerQuery, setCustomerQuery] = useState(initialCustomer?.name ?? "");
   const [customerSuggestions, setCustomerSuggestions] = useState<CustomerSuggestion[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Partial<CustomerSuggestion> | null>(initialCustomer ?? null);
+  const [showDueDateCalendar, setShowDueDateCalendar] = useState(false);
+  const [showReceivedDateCalendar, setShowReceivedDateCalendar] = useState(false);
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
+  const [receivedDate, setReceivedDate] = useState<Date>(new Date());
 
   useEffect(() => {
     if (customerQuery.trim().length < 2) {
@@ -789,6 +796,10 @@ function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, on
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
+    if (dueDate) {
+      fd.set("dueDate", format(dueDate, "yyyy-MM-dd"));
+    }
+    fd.set("receivedDate", format(receivedDate, "yyyy-MM-dd"));
     startTransition(async () => {
       await createProductionOrder(fd);
       onDone();
@@ -879,11 +890,55 @@ function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, on
           </div>
           <div className="space-y-1 relative">
             <label className="text-xs text-slate-400">Termin realizacji</label>
-            <Input name="dueDate" type="date" className="bg-slate-950 z-10" />
+            <div className="relative">
+              <Input 
+                type="text" 
+                readOnly 
+                value={dueDate ? format(dueDate, "yyyy-MM-dd") : ""} 
+                placeholder="Kliknij aby wybrać datę"
+                onClick={() => setShowDueDateCalendar(!showDueDateCalendar)}
+                className="bg-slate-950 cursor-pointer z-10"
+              />
+              {showDueDateCalendar && (
+                <div className="absolute z-50 mt-1 rounded-lg border border-slate-700 bg-slate-950 p-2 shadow-xl">
+                  <DayPicker
+                    mode="single"
+                    selected={dueDate}
+                    onSelect={(date) => {
+                      setDueDate(date);
+                      setShowDueDateCalendar(false);
+                    }}
+                    className="bg-slate-950 text-slate-100"
+                  />
+                </div>
+              )}
+            </div>
           </div>
           <div className="space-y-1 relative">
             <label className="text-xs text-slate-400">Data przyjęcia</label>
-            <Input name="receivedDate" type="date" defaultValue={new Date().toISOString().slice(0, 10)} className="bg-slate-950 z-10" />
+            <div className="relative">
+              <Input 
+                type="text" 
+                readOnly 
+                value={format(receivedDate, "yyyy-MM-dd")} 
+                placeholder="Kliknij aby wybrać datę"
+                onClick={() => setShowReceivedDateCalendar(!showReceivedDateCalendar)}
+                className="bg-slate-950 cursor-pointer z-10"
+              />
+              {showReceivedDateCalendar && (
+                <div className="absolute z-50 mt-1 rounded-lg border border-slate-700 bg-slate-950 p-2 shadow-xl">
+                  <DayPicker
+                    mode="single"
+                    selected={receivedDate}
+                    onSelect={(date) => {
+                      if (date) setReceivedDate(date);
+                      setShowReceivedDateCalendar(false);
+                    }}
+                    className="bg-slate-950 text-slate-100"
+                  />
+                </div>
+              )}
+            </div>
           </div>
           <div className="space-y-1">
             <label className="text-xs text-slate-400">Kolor</label>
