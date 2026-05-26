@@ -454,9 +454,9 @@ function OrderCard({
         {editingOrder && canManage ? (
           <form onSubmit={handleSaveOrder} className="space-y-3 rounded-xl border border-emerald-800/40 bg-slate-950 p-4">
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400">Numer *</label>
-                <Input name="number" defaultValue={order.number} required className="bg-slate-900" />
+              <div className="space-y-1 sm:col-span-2">
+                <label className="text-xs text-slate-400">Numer zlecenia</label>
+                <div className="text-sm font-mono text-slate-300">{order.number}</div>
               </div>
               <div className="space-y-1">
                 <label className="text-xs text-slate-400">Nazwa *</label>
@@ -767,11 +767,7 @@ function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, on
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-2">
-          <div className="space-y-1">
-            <label className="text-xs text-slate-400">Numer zlecenia *</label>
-            <Input name="number" required placeholder="np. ZP-2025-001" className="bg-slate-950" />
-          </div>
-          <div className="space-y-1">
+          <div className="space-y-1 sm:col-span-2">
             <label className="text-xs text-slate-400">Nazwa zlecenia *</label>
             <Input name="name" required placeholder="np. Obudowa aluminiowa serii X" className="bg-slate-950" />
           </div>

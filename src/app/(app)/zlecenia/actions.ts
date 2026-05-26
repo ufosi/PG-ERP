@@ -7,7 +7,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
 const orderSchema = z.object({
-  number: z.string().trim().min(2).max(50),
+  number: z.string().trim().min(2).max(50).optional(),
   name: z.string().trim().min(2).max(120),
   customer: z.string().trim().max(120).optional(),
   customerPhone: z.string().trim().max(50).optional(),
@@ -92,6 +92,27 @@ function canManageOrders(role: string) {
   return role === "ADMIN" || role === "BIURO";
 }
 
+async function generateOrderNumber(): Promise<string> {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const year = now.getFullYear();
+
+  const currentMonthStart = new Date(year, now.getMonth(), 1);
+  const currentMonthEnd = new Date(year, now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+  const count = await prisma.productionOrder.count({
+    where: {
+      createdAt: {
+        gte: currentMonthStart,
+        lte: currentMonthEnd,
+      },
+    },
+  });
+
+  const nextNumber = count + 1;
+  return `${nextNumber}/${month}/${year}`;
+}
+
 export async function createProductionOrder(formData: FormData) {
   const session = await requireSession();
 
@@ -100,7 +121,6 @@ export async function createProductionOrder(formData: FormData) {
   }
 
   const parsed = orderSchema.parse({
-    number: formData.get("number"),
     name: formData.get("name"),
     customer: formData.get("customer") || undefined,
     customerPhone: formData.get("customerPhone") || undefined,
@@ -126,10 +146,11 @@ export async function createProductionOrder(formData: FormData) {
   const serviceOptionIds = formData.getAll("serviceOptionIds").map(String).filter(Boolean);
   const workerCanComplete = parseWorkerCanComplete(formData);
   const customer = await findOrCreateCustomer(parsed.customer, parsed.customerPhone, parsed.customerEmail, parsed.customerTaxId, parsed.customerStreet, parsed.customerPostalCode, parsed.customerCity, parsed.customerCountry);
+  const orderNumber = await generateOrderNumber();
 
   await prisma.productionOrder.create({
     data: {
-      number: parsed.number,
+      number: orderNumber,
       name: parsed.name,
       customer: parsed.customer,
       customerId: customer?.id ?? null,
@@ -432,7 +453,7 @@ export async function updateProductionOrder(formData: FormData) {
   const orderId = String(formData.get("orderId") ?? "");
 
   const parsed = orderSchema.parse({
-    number: formData.get("number"),
+    number: formData.get("number") || undefined,
     name: formData.get("name"),
     customer: formData.get("customer") || undefined,
     customerPhone: formData.get("customerPhone") || undefined,
@@ -454,13 +475,15 @@ export async function updateProductionOrder(formData: FormData) {
     comments: formData.get("comments") || undefined,
   });
 
-  const numberClash = await prisma.productionOrder.findFirst({
-    where: { number: parsed.number, NOT: { id: orderId } },
-    select: { id: true },
-  });
+  if (parsed.number) {
+    const numberClash = await prisma.productionOrder.findFirst({
+      where: { number: parsed.number, NOT: { id: orderId } },
+      select: { id: true },
+    });
 
-  if (numberClash) {
-    throw new Error(`Numer zlecenia "${parsed.number}" jest już używany przez inne zlecenie.`);
+    if (numberClash) {
+      throw new Error(`Numer zlecenia "${parsed.number}" jest już używany przez inne zlecenie.`);
+    }
   }
 
   const serviceOptionIds = formData.getAll("serviceOptionIds").map(String).filter(Boolean);
