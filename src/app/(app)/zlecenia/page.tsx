@@ -19,7 +19,7 @@ export default async function ZleceniaPage() {
     redirect("/produkcja");
   }
 
-  const [orders, categories, serviceOptions] = await Promise.all([
+  const [orders, categories, serviceOptions, settings] = await Promise.all([
     prisma.productionOrder.findMany({
       where: isManager ? undefined : { assignees: { some: { id: userId } } },
       orderBy: { createdAt: "desc" },
@@ -44,6 +44,7 @@ export default async function ZleceniaPage() {
       where: { active: true },
       orderBy: { name: "asc" },
     }),
+    prisma.settings.findFirst(),
   ]);
 
   const activeLog = await prisma.workLog.findFirst({
@@ -68,6 +69,7 @@ export default async function ZleceniaPage() {
       activeLogOrderId={activeLog?.orderId ?? null}
       categories={categories}
       serviceOptions={serviceOptions}
+      settings={settings ?? { yellowWarningDays: 7, redWarningDays: 3 }}
     />
   );
 }

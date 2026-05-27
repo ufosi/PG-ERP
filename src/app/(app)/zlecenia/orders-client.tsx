@@ -74,6 +74,10 @@ type Props = {
   activeLogOrderId: string | null;
   categories: Category[];
   serviceOptions: ServiceOption[];
+  settings: {
+    yellowWarningDays: number;
+    redWarningDays: number;
+  };
 };
 
 const STATUS_LABELS: Record<string, { label: string; cls: string }> = {
@@ -298,6 +302,7 @@ function OrderCard({
   categories,
   serviceOptions,
   highlighted,
+  settings,
 }: {
   order: Order;
   workers: Worker[];
@@ -308,6 +313,10 @@ function OrderCard({
   categories: Category[];
   serviceOptions: ServiceOption[];
   highlighted?: boolean;
+  settings: {
+    yellowWarningDays: number;
+    redWarningDays: number;
+  };
 }) {
   const [expanded, setExpanded] = useState(false);
   const [editingAssignees, setEditingAssignees] = useState(false);
@@ -319,6 +328,30 @@ function OrderCard({
   const isActiveHere = activeLogOrderId === order.id;
   const myOpenLog = order.workLogs.find((l) => l.user.id === userId && !l.endedAt);
   const hasLongRunning = order.workLogs.some(isLongRunning);
+
+  // Calculate highlighting based on due date
+  const getWarningLevel = () => {
+    if (!order.dueDate) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(order.dueDate);
+    dueDate.setHours(0, 0, 0, 0);
+    const daysUntilDue = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (daysUntilDue < 0) return "overdue";
+    if (daysUntilDue <= settings.redWarningDays) return "red";
+    if (daysUntilDue <= settings.yellowWarningDays) return "yellow";
+    return null;
+  };
+
+  const warningLevel = getWarningLevel();
+  const warningClass = warningLevel === "overdue" 
+    ? "border-red-500/50 bg-red-500/10" 
+    : warningLevel === "red"
+    ? "border-red-500/40 bg-red-500/5"
+    : warningLevel === "yellow"
+    ? "border-yellow-500/40 bg-yellow-500/5"
+    : "";
 
   function handleSaveAssignees(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -387,7 +420,7 @@ function OrderCard({
   }
 
   return (
-    <Card id={`order-${order.id}`} className={`border-slate-800 bg-slate-900/70 ${highlighted ? "ring-2 ring-emerald-400 shadow-lg shadow-emerald-950/40" : ""}`}>
+    <Card id={`order-${order.id}`} className={`border-slate-800 bg-slate-900/70 ${highlighted ? "ring-2 ring-emerald-400 shadow-lg shadow-emerald-950/40" : ""} ${warningClass}`}>
       <CardHeader className="pb-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
@@ -1040,7 +1073,7 @@ function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, on
   );
 }
 
-export function OrdersClient({ orders, workers, userId, role, activeLogId, activeLogOrderId, categories, serviceOptions }: Props) {
+export function OrdersClient({ orders, workers, userId, role, activeLogId, activeLogOrderId, categories, serviceOptions, settings }: Props) {
   const searchParams = useSearchParams();
   const highlightedOrderId = searchParams.get("order");
   const initialCustomer = searchParams.get("customer")
@@ -1169,6 +1202,7 @@ export function OrdersClient({ orders, workers, userId, role, activeLogId, activ
             categories={categories}
             serviceOptions={serviceOptions}
             highlighted={order.id === highlightedOrderId}
+            settings={settings}
           />
         ))}
       </div>
@@ -1191,6 +1225,7 @@ export function OrdersClient({ orders, workers, userId, role, activeLogId, activ
                 categories={categories}
                 serviceOptions={serviceOptions}
                 highlighted={order.id === highlightedOrderId}
+                settings={settings}
               />
             ))}
           </div>

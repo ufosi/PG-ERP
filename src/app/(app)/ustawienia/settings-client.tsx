@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { ClipboardList, Settings, Workflow, X } from "lucide-react";
+import { useState, useTransition, useEffect } from "react";
+import { ClipboardList, Settings, Workflow, X, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,89 @@ import { createJobServiceOption, createProductionOrderCategory, deleteJobService
 
 type Category = { id: string; name: string };
 type ServiceOption = { id: string; name: string };
+
+type WarningSettings = {
+  yellowWarningDays: number;
+  redWarningDays: number;
+};
+
+function WarningSettings() {
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string>();
+  const [settings, setSettings] = useState<WarningSettings>({
+    yellowWarningDays: 7,
+    redWarningDays: 3,
+  });
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => setSettings(data))
+      .catch(() => {});
+  }, []);
+
+  function handleSave(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(undefined);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const yellowWarningDays = parseInt(fd.get("yellowWarningDays") as string);
+    const redWarningDays = parseInt(fd.get("redWarningDays") as string);
+
+    startTransition(async () => {
+      try {
+        const res = await fetch("/api/settings", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ yellowWarningDays, redWarningDays }),
+        });
+        if (!res.ok) throw new Error("Nie udało się zapisać ustawień.");
+        const data = await res.json();
+        setSettings(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Nie udało się zapisać ustawień.");
+      }
+    });
+  }
+
+  return (
+    <Card className="border-slate-800 bg-slate-900/70">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base"><AlertTriangle className="h-4 w-4" />Podświetlanie zleceń</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <form onSubmit={handleSave} className="flex flex-wrap items-end gap-3">
+          <div className="flex-1 min-w-32">
+            <label className="text-xs text-slate-400 mb-1 block">Żółte ostrzeżenie (dni)</label>
+            <Input 
+              name="yellowWarningDays" 
+              type="number" 
+              min="0" 
+              defaultValue={settings.yellowWarningDays}
+              className="bg-slate-950" 
+            />
+          </div>
+          <div className="flex-1 min-w-32">
+            <label className="text-xs text-slate-400 mb-1 block">Czerwone ostrzeżenie (dni)</label>
+            <Input 
+              name="redWarningDays" 
+              type="number" 
+              min="0" 
+              defaultValue={settings.redWarningDays}
+              className="bg-slate-950" 
+            />
+          </div>
+          <Button type="submit" disabled={pending} className="bg-emerald-600 hover:bg-emerald-500">Zapisz</Button>
+        </form>
+        {error && <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200">{error}</div>}
+        <p className="text-xs text-slate-500">
+          Zlecenia z terminem realizacji w ciągu {settings.yellowWarningDays} dni będą podświetlone na żółto, 
+          a w ciągu {settings.redWarningDays} dni na czerwono.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
 
 function CategorySettings({ categories }: { categories: Category[] }) {
   const [pending, startTransition] = useTransition();
@@ -135,6 +218,7 @@ export function SettingsClient({ categories, serviceOptions }: { categories: Cat
         </div>
       </div>
       <div className="grid gap-4 xl:grid-cols-2">
+        <WarningSettings />
         <CategorySettings categories={categories} />
         <OperationSettings serviceOptions={serviceOptions} />
       </div>

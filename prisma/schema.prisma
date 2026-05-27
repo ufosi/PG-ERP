@@ -148,3 +148,10 @@ model WorkLog {
   @@index([userId])
   @@index([startedAt])
 }
+
+model Settings {
+  id                    String @id @default(cuid())
+  yellowWarningDays     Int    @default(7)
+  redWarningDays        Int    @default(3)
+  updatedAt             DateTime @updatedAt
+}
