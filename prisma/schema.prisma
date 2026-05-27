@@ -70,7 +70,7 @@ model ProductionOrder {
   customerId  String?
   customerRef Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
   description String?
-  status      String    @default("OPEN")
+  status      String    @default("NEW")
   color       String?
   photos      String?
   price       Float?
