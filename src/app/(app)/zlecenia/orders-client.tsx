@@ -776,7 +776,7 @@ function OrderCard({
               {order.status !== "CANCELLED" && order.status !== "DONE" && (
                 <Button size="sm" variant="ghost" disabled={pending} onClick={() => handleStatus("CANCELLED")}
                   className="text-red-400 hover:text-red-300">
-                  Anuluj
+                  Anuluj zlecenie
                 </Button>
               )}
               {(order.status === "DONE" || order.status === "CANCELLED") && (
