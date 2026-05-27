@@ -12,7 +12,7 @@ export default async function ProductionPage() {
   const [orders, categories] = await Promise.all([
     prisma.productionOrder.findMany({
       where: {
-        status: { in: ["OPEN", "IN_PROGRESS"] },
+        status: { in: ["IN_PROGRESS"] },
         ...(manager ? {} : { assignees: { some: { id: userId } } }),
       },
       orderBy: [{ status: "asc" }, { dueDate: "asc" }, { createdAt: "desc" }],
@@ -41,7 +41,6 @@ export default async function ProductionPage() {
     name: o.name,
     customer: o.customer,
     status: o.status,
-    workflow: o.workflow,
     color: o.color,
     dueDate: o.dueDate,
     workerCanComplete: o.workerCanComplete,

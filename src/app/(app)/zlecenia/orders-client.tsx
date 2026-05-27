@@ -81,9 +81,11 @@ type Props = {
 };
 
 const STATUS_LABELS: Record<string, { label: string; cls: string }> = {
-  OPEN: { label: "Otwarte", cls: "bg-sky-500/15 text-sky-300 ring-sky-500/30" },
+  NEW: { label: "Nowe", cls: "bg-sky-500/15 text-sky-300 ring-sky-500/30" },
   IN_PROGRESS: { label: "W toku", cls: "bg-amber-500/15 text-amber-300 ring-amber-500/30" },
-  DONE: { label: "Zakończone", cls: "bg-emerald-500/15 text-emerald-300 ring-emerald-500/30" },
+  COMPLETED: { label: "Zrealizowane", cls: "bg-emerald-500/15 text-emerald-300 ring-emerald-500/30" },
+  READY_FOR_PICKUP: { label: "Gotowe do odbioru", cls: "bg-purple-500/15 text-purple-300 ring-purple-500/30" },
+  DONE: { label: "Zakończone", cls: "bg-slate-500/15 text-slate-300 ring-slate-500/30" },
   CANCELLED: { label: "Anulowane", cls: "bg-red-500/15 text-red-300 ring-red-500/30" },
 };
 
@@ -600,7 +602,7 @@ function OrderCard({
                     className="mt-0.5 h-4 w-4 rounded border-slate-700"
                   />
                   <div>
-                    <div className="font-medium text-slate-200">Pracownik może oznaczyć jako zakończone</div>
+                    <div className="font-medium text-slate-200">Pracownik może oznaczyć jako zrealizowane</div>
                     <div className="text-xs text-slate-500">
                       Włącz dla krótkich, jednorazowych zleceń. Wyłącz dla długich i ogólnych prac gospodarczych.
                     </div>
@@ -733,15 +735,43 @@ function OrderCard({
           )}
           {canManage && (
             <>
-              {order.status === "OPEN" && (
+              {order.status === "NEW" && (
                 <Button size="sm" variant="outline" disabled={pending} onClick={() => handleStatus("IN_PROGRESS")}>
-                  Ustaw: W toku
+                  Przekaż na produkcję
                 </Button>
               )}
               {order.status === "IN_PROGRESS" && (
-                <Button size="sm" variant="outline" disabled={pending} onClick={() => handleStatus("DONE")}>
-                  Ustaw: Zakończone
-                </Button>
+                <>
+                  <Button size="sm" variant="outline" disabled={pending} onClick={() => handleStatus("COMPLETED")}>
+                    Zrealizowane
+                  </Button>
+                  <Button size="sm" variant="ghost" disabled={pending} onClick={() => handleStatus("NEW")} className="gap-1 text-slate-400 hover:text-slate-300">
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    Cofnij do Nowe
+                  </Button>
+                </>
+              )}
+              {order.status === "COMPLETED" && (
+                <>
+                  <Button size="sm" variant="outline" disabled={pending} onClick={() => handleStatus("READY_FOR_PICKUP")}>
+                    Gotowe do odbioru
+                  </Button>
+                  <Button size="sm" variant="ghost" disabled={pending} onClick={() => handleStatus("IN_PROGRESS")} className="gap-1 text-slate-400 hover:text-slate-300">
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    Cofnij do W toku
+                  </Button>
+                </>
+              )}
+              {order.status === "READY_FOR_PICKUP" && (
+                <>
+                  <Button size="sm" variant="outline" disabled={pending} onClick={() => handleStatus("DONE")}>
+                    Zakończone
+                  </Button>
+                  <Button size="sm" variant="ghost" disabled={pending} onClick={() => handleStatus("COMPLETED")} className="gap-1 text-slate-400 hover:text-slate-300">
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    Cofnij do Zrealizowane
+                  </Button>
+                </>
               )}
               {order.status !== "CANCELLED" && order.status !== "DONE" && (
                 <Button size="sm" variant="ghost" disabled={pending} onClick={() => handleStatus("CANCELLED")}
@@ -750,7 +780,7 @@ function OrderCard({
                 </Button>
               )}
               {(order.status === "DONE" || order.status === "CANCELLED") && (
-                <Button size="sm" variant="outline" disabled={pending} onClick={() => handleStatus("OPEN")} className="gap-1 text-emerald-300 hover:text-emerald-200">
+                <Button size="sm" variant="outline" disabled={pending} onClick={() => handleStatus("NEW")} className="gap-1 text-emerald-300 hover:text-emerald-200">
                   <RotateCcw className="h-3.5 w-3.5" />
                   Otwórz ponownie
                 </Button>
@@ -1031,9 +1061,9 @@ function NewOrderForm({ workers, categories, serviceOptions, initialCustomer, on
                 className="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-950"
               />
               <div>
-                <div className="font-medium text-slate-200">Pracownik może oznaczyć jako zakończone</div>
+                <div className="font-medium text-slate-200">Pracownik może oznaczyć jako zrealizowane</div>
                 <div className="text-xs text-slate-500">
-                  Krótkie zlecenia — pracownik sam zamknie po wykonaniu. Zostaw odznaczone dla długich i ogólnych (sprzątanie, prace gospodarcze).
+                  Krótkie zlecenia — pracownik sam oznaczy jako zrealizowane po wykonaniu. Zostaw odznaczone dla długich i ogólnych (sprzątanie, prace gospodarcze).
                 </div>
               </div>
             </label>
@@ -1130,8 +1160,8 @@ export function OrdersClient({ orders, workers, userId, role, activeLogId, activ
     }, 100);
   }, [highlightedOrderId]);
 
-  const active = filteredOrders.filter((o) => o.status === "OPEN" || o.status === "IN_PROGRESS");
-  const done = filteredOrders.filter((o) => o.status === "DONE" || o.status === "CANCELLED");
+  const active = filteredOrders.filter((o) => o.status === "NEW" || o.status === "IN_PROGRESS");
+  const done = filteredOrders.filter((o) => o.status === "COMPLETED" || o.status === "READY_FOR_PICKUP" || o.status === "DONE" || o.status === "CANCELLED");
   const longRunningLogs = orders.flatMap((order) =>
     order.workLogs
       .filter(isLongRunning)

@@ -18,7 +18,6 @@ type Order = {
   name: string;
   customer: string | null;
   status: string;
-  workflow: string;
   color: string | null;
   dueDate: Date | null;
   workerCanComplete: boolean;
@@ -133,9 +132,6 @@ function OrderTile({
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-mono text-base text-slate-400">#{order.number}</span>
               <StatusPill status={order.status} />
-              <span className="inline-flex rounded-full bg-indigo-500/10 px-2.5 py-0.5 text-xs font-medium text-indigo-300 ring-1 ring-indigo-500/30">
-                {order.workflow === "SIMPLE" ? "Prosty" : "Rozszerzone"}
-              </span>
             </div>
             <div className="mt-1 text-xl font-semibold leading-tight">{order.name}</div>
             {order.category && (

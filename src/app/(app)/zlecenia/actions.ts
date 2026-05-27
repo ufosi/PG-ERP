@@ -552,7 +552,7 @@ export async function setOrderStatus(formData: FormData) {
   }
 
   const orderId = String(formData.get("orderId") ?? "");
-  const status = String(formData.get("status") ?? "OPEN");
+  const status = String(formData.get("status") ?? "NEW");
 
   const isClosed = status === "DONE" || status === "CANCELLED";
 
