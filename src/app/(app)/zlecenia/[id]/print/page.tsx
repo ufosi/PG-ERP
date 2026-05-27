@@ -163,7 +163,7 @@ export default function PrintOrderPage({ params }: { params: Promise<{ id: strin
         {/* Production Comments */}
         {order.productionComments && (
           <div className="mb-6 rounded-lg border-2 border-black p-4">
-            <div className="mb-2 text-sm font-bold text-gray-600">Komentarze produkcji</div>
+            <div className="mb-2 text-sm font-bold text-gray-600">Uwagi na produkcję</div>
             <div className="whitespace-pre-wrap text-base">{order.productionComments}</div>
           </div>
         )}
