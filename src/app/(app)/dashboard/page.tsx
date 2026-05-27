@@ -219,7 +219,7 @@ export default async function DashboardPage() {
           accent={activeLog ? "text-emerald-400" : "text-slate-400"}
         />
         <StatCard
-          label="Pracownik"
+          label="Zalogowany"
           value={userName}
           icon={Users}
           accent="text-violet-400"
