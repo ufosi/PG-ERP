@@ -1,36 +1,31 @@
-import { requireUserSession } from "@/lib/auth-session";
-import { prisma } from "@/lib/prisma";
+"use client";
+
+import { useEffect, useState } from "react";
 import { formatDate } from "@/lib/time";
-import { notFound } from "next/navigation";
 
-export default async function PrintOrderPage({ params }: { params: { id: string } }) {
-  const session = await requireUserSession();
-  const role = session.user.role;
-  const canManage = role === "ADMIN" || role === "BIURO";
+export default function PrintOrderPage({ params }: { params: { id: string } }) {
+  const [order, setOrder] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!canManage) {
-    return <div>Brak uprawnień</div>;
-  }
+  useEffect(() => {
+    async function fetchOrder() {
+      try {
+        const response = await fetch(`/api/orders/${params.id}/print`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch order");
+        }
+        const data = await response.json();
+        setOrder(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Error fetching order");
+      } finally {
+        setLoading(false);
+      }
+    }
 
-  const order = await prisma.productionOrder.findUnique({
-    where: { id: params.id },
-    include: {
-      assignees: { select: { id: true, name: true, role: true } },
-      category: { select: { id: true, name: true } },
-      serviceOptions: { select: { id: true, name: true } },
-      createdBy: { select: { name: true } },
-      workLogs: {
-        include: {
-          user: { select: { name: true } },
-        },
-        orderBy: { startedAt: "desc" },
-      },
-    },
-  });
-
-  if (!order) {
-    notFound();
-  }
+    fetchOrder();
+  }, [params.id]);
 
   const statusLabels: Record<string, string> = {
     NEW: "Nowe",
@@ -40,6 +35,18 @@ export default async function PrintOrderPage({ params }: { params: { id: string 
     DONE: "Zakończone",
     CANCELLED: "Anulowane",
   };
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center text-black">Ładowanie...</div>;
+  }
+
+  if (error) {
+    return <div className="min-h-screen flex items-center justify-center text-red-600">Błąd: {error}</div>;
+  }
+
+  if (!order) {
+    return <div className="min-h-screen flex items-center justify-center text-black">Zlecenie nie znalezione</div>;
+  }
 
   return (
     <div className="min-h-screen bg-white p-8 text-black print:p-4">
@@ -105,7 +112,7 @@ export default async function PrintOrderPage({ params }: { params: { id: string 
           <div className="mb-6 rounded-lg border-2 border-black p-4">
             <div className="mb-2 text-sm font-bold text-gray-600">Operacje technologiczne</div>
             <ul className="list-inside list-disc text-base">
-              {order.serviceOptions.map((opt) => (
+              {order.serviceOptions.map((opt: { id: string; name: string }) => (
                 <li key={opt.id}>{opt.name}</li>
               ))}
             </ul>
@@ -141,7 +148,7 @@ export default async function PrintOrderPage({ params }: { params: { id: string 
           <div className="mb-6 rounded-lg border-2 border-black p-4">
             <div className="mb-2 text-sm font-bold text-gray-600">Przypisani pracownicy</div>
             <ul className="list-inside list-disc text-base">
-              {order.assignees.map((worker) => (
+              {order.assignees.map((worker: { id: string; name: string; role: string }) => (
                 <li key={worker.id}>
                   {worker.name} ({worker.role})
                 </li>
