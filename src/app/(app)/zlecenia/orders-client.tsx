@@ -1164,7 +1164,7 @@ export function OrdersClient({ orders, workers, userId, role, activeLogId, activ
     }, 100);
   }, [highlightedOrderId]);
 
-  const active = filteredOrders.filter((o) => o.status === "NEW" || o.status === "IN_PROGRESS" || o.status === "COMPLETED" || o.status === "READY_FOR_PICKUP");
+  const active = filteredOrders.filter((o) => o.status === "OPEN" || o.status === "NEW" || o.status === "IN_PROGRESS" || o.status === "COMPLETED" || o.status === "READY_FOR_PICKUP");
   const done = filteredOrders.filter((o) => o.status === "DONE" || o.status === "CANCELLED");
   const longRunningLogs = orders.flatMap((order) =>
     order.workLogs
