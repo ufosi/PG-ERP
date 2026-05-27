@@ -17,6 +17,9 @@ export default function PrintOrderPage({ params }: { params: Promise<{ id: strin
           throw new Error("Failed to fetch order");
         }
         const data = await response.json();
+        // Convert date strings to Date objects
+        if (data.createdAt) data.createdAt = new Date(data.createdAt);
+        if (data.dueDate) data.dueDate = new Date(data.dueDate);
         setOrder(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error fetching order");
