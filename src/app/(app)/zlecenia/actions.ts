@@ -168,6 +168,7 @@ export async function createProductionOrder(formData: FormData) {
       dueDate: parsed.dueDate ? new Date(parsed.dueDate) : null,
       receivedDate: parsed.receivedDate ? new Date(parsed.receivedDate) : new Date(),
       workerCanComplete,
+      status: "NEW",
       createdById: session.user.id,
       assignees: assigneeIds.length ? { connect: assigneeIds.map((id) => ({ id })) } : undefined,
       serviceOptions: serviceOptionIds.length ? { connect: serviceOptionIds.map((id) => ({ id })) } : undefined,
