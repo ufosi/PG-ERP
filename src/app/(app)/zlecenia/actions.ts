@@ -390,7 +390,10 @@ export async function forceStopWorkLog(formData: FormData) {
 }
 
 export async function autoCloseLongRunningLogs() {
-  const LONG_LOG_MS = 12 * 60 * 60 * 1000; // 12 hours
+  // Get auto-close hours from settings
+  const settings = await prisma.settings.findFirst();
+  const autoCloseHours = settings?.autoCloseHours ?? 12;
+  const LONG_LOG_MS = autoCloseHours * 60 * 60 * 1000;
   const cutoff = new Date(Date.now() - LONG_LOG_MS);
 
   const result = await prisma.workLog.updateMany({
@@ -400,7 +403,7 @@ export async function autoCloseLongRunningLogs() {
     },
     data: {
       endedAt: new Date(),
-      note: "Automatycznie zamknięte - przekroczono 12h",
+      note: `Automatycznie zamknięte - przekroczono ${autoCloseHours}h`,
     },
   });
 

@@ -153,5 +153,6 @@ model Settings {
   id                    String @id @default(cuid())
   yellowWarningDays     Int    @default(7)
   redWarningDays        Int    @default(3)
+  autoCloseHours        Int    @default(12)
   updatedAt             DateTime @updatedAt
 }

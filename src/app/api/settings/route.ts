@@ -21,6 +21,7 @@ export async function GET() {
       data: {
         yellowWarningDays: 7,
         redWarningDays: 3,
+        autoCloseHours: 12,
       },
     });
   }
@@ -41,13 +42,13 @@ export async function PUT(request: Request) {
   }
 
   const body = await request.json();
-  const { yellowWarningDays, redWarningDays } = body;
+  const { yellowWarningDays, redWarningDays, autoCloseHours } = body;
 
-  if (typeof yellowWarningDays !== "number" || typeof redWarningDays !== "number") {
+  if (typeof yellowWarningDays !== "number" || typeof redWarningDays !== "number" || typeof autoCloseHours !== "number") {
     return NextResponse.json({ error: "Invalid values" }, { status: 400 });
   }
 
-  if (yellowWarningDays < 0 || redWarningDays < 0) {
+  if (yellowWarningDays < 0 || redWarningDays < 0 || autoCloseHours < 1) {
     return NextResponse.json({ error: "Values must be positive" }, { status: 400 });
   }
 
@@ -58,6 +59,7 @@ export async function PUT(request: Request) {
       data: {
         yellowWarningDays,
         redWarningDays,
+        autoCloseHours,
       },
     });
   } else {
@@ -66,6 +68,7 @@ export async function PUT(request: Request) {
       data: {
         yellowWarningDays,
         redWarningDays,
+        autoCloseHours,
       },
     });
   }

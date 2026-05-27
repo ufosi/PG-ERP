@@ -13,6 +13,7 @@ type ServiceOption = { id: string; name: string };
 type WarningSettings = {
   yellowWarningDays: number;
   redWarningDays: number;
+  autoCloseHours: number;
 };
 
 function WarningSettings() {
@@ -21,6 +22,7 @@ function WarningSettings() {
   const [settings, setSettings] = useState<WarningSettings>({
     yellowWarningDays: 7,
     redWarningDays: 3,
+    autoCloseHours: 12,
   });
 
   useEffect(() => {
@@ -37,13 +39,14 @@ function WarningSettings() {
     const fd = new FormData(form);
     const yellowWarningDays = parseInt(fd.get("yellowWarningDays") as string);
     const redWarningDays = parseInt(fd.get("redWarningDays") as string);
+    const autoCloseHours = parseInt(fd.get("autoCloseHours") as string);
 
     startTransition(async () => {
       try {
         const res = await fetch("/api/settings", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ yellowWarningDays, redWarningDays }),
+          body: JSON.stringify({ yellowWarningDays, redWarningDays, autoCloseHours }),
         });
         if (!res.ok) throw new Error("Nie udało się zapisać ustawień.");
         const data = await res.json();
@@ -57,7 +60,7 @@ function WarningSettings() {
   return (
     <Card className="border-slate-800 bg-slate-900/70">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base"><AlertTriangle className="h-4 w-4" />Podświetlanie zleceń</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-base"><AlertTriangle className="h-4 w-4" />Ustawienia zleceń</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <form onSubmit={handleSave} className="flex flex-wrap items-end gap-3">
@@ -81,12 +84,23 @@ function WarningSettings() {
               className="bg-slate-950" 
             />
           </div>
+          <div className="flex-1 min-w-32">
+            <label className="text-xs text-slate-400 mb-1 block">Auto-zamykanie odbić (godz)</label>
+            <Input 
+              name="autoCloseHours" 
+              type="number" 
+              min="1" 
+              defaultValue={settings.autoCloseHours}
+              className="bg-slate-950" 
+            />
+          </div>
           <Button type="submit" disabled={pending} className="bg-emerald-600 hover:bg-emerald-500">Zapisz</Button>
         </form>
         {error && <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200">{error}</div>}
         <p className="text-xs text-slate-500">
           Zlecenia z terminem realizacji w ciągu {settings.yellowWarningDays} dni będą podświetlone na żółto, 
           a w ciągu {settings.redWarningDays} dni na czerwono.
+          Odbicia dłuższe niż {settings.autoCloseHours} godzin zostaną automatycznie zamknięte.
         </p>
       </CardContent>
     </Card>
