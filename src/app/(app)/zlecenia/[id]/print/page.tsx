@@ -44,7 +44,7 @@ export default function PrintOrderPage({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <div className="min-h-screen bg-white p-8 text-black print:p-4 print:bg-white print:text-black">
+    <div className="min-h-screen bg-white p-4 text-black print:p-2 print:bg-white print:text-black">
       <style jsx global>{`
         @media print {
           body {
@@ -63,73 +63,73 @@ export default function PrintOrderPage({ params }: { params: Promise<{ id: strin
             top: 0 !important;
             width: 100% !important;
             margin: 0 !important;
-            padding: 20px !important;
+            padding: 10px !important;
             background: white !important;
             color: black !important;
           }
           @page {
-            margin: 1cm;
+            margin: 0.5cm;
           }
         }
       `}</style>
       <div className="mx-auto max-w-4xl">
         {/* Header */}
-        <div className="mb-8 border-b-2 border-black pb-4">
-          <h1 className="text-3xl font-bold">KARTA ZLECENIA PRODUKCYJNEGO</h1>
-          <div className="mt-2 text-sm text-gray-600">
+        <div className="mb-4 border-b-2 border-black pb-2">
+          <h1 className="text-2xl font-bold">KARTA ZLECENIA PRODUKCYJNEGO</h1>
+          <div className="mt-1 text-xs text-gray-600">
             Wygenerowano: {formatDate(new Date())}
           </div>
         </div>
 
         {/* Order Info */}
-        <div className="mb-4 grid grid-cols-2 gap-2 rounded-lg border-2 border-black p-3 text-sm">
+        <div className="mb-3 grid grid-cols-2 gap-2 rounded-lg border-2 border-black p-2 text-xs">
           <div>
             <div className="text-xs font-bold text-gray-600">Numer zlecenia</div>
-            <div className="text-lg font-mono font-bold">{order.number}</div>
+            <div className="text-base font-mono font-bold">{order.number}</div>
           </div>
           <div>
             <div className="text-xs font-bold text-gray-600">Data utworzenia</div>
-            <div className="text-base">{formatDate(order.createdAt)}</div>
+            <div className="text-sm">{formatDate(order.createdAt)}</div>
           </div>
           <div className="col-span-2">
             <div className="text-xs font-bold text-gray-600">Nazwa zlecenia</div>
-            <div className="text-lg font-bold">{order.name}</div>
+            <div className="text-base font-bold">{order.name}</div>
           </div>
           {order.customer && (
             <div className="col-span-2">
               <div className="text-xs font-bold text-gray-600">Klient</div>
-              <div className="text-base">{order.customer}</div>
+              <div className="text-sm">{order.customer}</div>
             </div>
           )}
           {order.dueDate && (
             <div className="col-span-2">
               <div className="text-xs font-bold text-gray-600">Termin realizacji</div>
-              <div className="text-base">{formatDate(order.dueDate)}</div>
+              <div className="text-sm">{formatDate(order.dueDate)}</div>
             </div>
           )}
         </div>
 
         {/* Description */}
         {order.description && (
-          <div className="mb-6 rounded-lg border-2 border-black p-4">
-            <div className="mb-2 text-sm font-bold text-gray-600">Opis</div>
-            <div className="whitespace-pre-wrap text-base">{order.description}</div>
+          <div className="mb-3 rounded-lg border-2 border-black p-2">
+            <div className="mb-1 text-xs font-bold text-gray-600">Opis</div>
+            <div className="whitespace-pre-wrap text-sm">{order.description}</div>
           </div>
         )}
 
         {/* Category */}
         {order.category && (
-          <div className="mb-6 rounded-lg border-2 border-black p-4">
-            <div className="text-sm font-bold text-gray-600">Kategoria</div>
-            <div className="text-xl">{order.category.name}</div>
+          <div className="mb-3 rounded-lg border-2 border-black p-2">
+            <div className="text-xs font-bold text-gray-600">Kategoria</div>
+            <div className="text-sm">{order.category.name}</div>
           </div>
         )}
 
         {/* Service Options */}
         {order.serviceOptions.length > 0 && (
-          <div className="mb-6 rounded-lg border-2 border-black p-4">
-            <div className="mb-2 text-sm font-bold text-gray-600">Operacje technologiczne</div>
-            <ul className="list-inside list-disc text-base">
+          <div className="mb-3 rounded-lg border-2 border-black p-2">
+            <div className="mb-1 text-xs font-bold text-gray-600">Operacje technologiczne</div>
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm list-inside list-disc">
               {order.serviceOptions.map((opt: { id: string; name: string }) => (
                 <li key={opt.id}>{opt.name}</li>
               ))}
@@ -139,32 +139,31 @@ export default function PrintOrderPage({ params }: { params: Promise<{ id: strin
 
         {/* Color */}
         {order.color && (
-          <div className="mb-6 rounded-lg border-2 border-black p-4">
-            <div className="text-sm font-bold text-gray-600">Kolor</div>
-            <div className="text-xl">{order.color}</div>
+          <div className="mb-3 rounded-lg border-2 border-black p-2">
+            <div className="text-xs font-bold text-gray-600">Kolor</div>
+            <div className="text-sm">{order.color}</div>
           </div>
         )}
 
         {/* Project Details */}
         {order.projectDetails && (
-          <div className="mb-6 rounded-lg border-2 border-black p-4">
-            <div className="mb-2 text-sm font-bold text-gray-600">Szczegóły projektu</div>
-            <div className="whitespace-pre-wrap text-base">{order.projectDetails}</div>
+          <div className="mb-3 rounded-lg border-2 border-black p-2">
+            <div className="mb-1 text-xs font-bold text-gray-600">Szczegóły projektu</div>
+            <div className="whitespace-pre-wrap text-sm">{order.projectDetails}</div>
           </div>
         )}
 
         {/* Production Comments */}
         {order.productionComments && (
-          <div className="mb-6 rounded-lg border-2 border-black p-4">
-            <div className="mb-2 text-sm font-bold text-gray-600">Uwagi na produkcję</div>
-            <div className="whitespace-pre-wrap text-base">{order.productionComments}</div>
+          <div className="mb-3 rounded-lg border-2 border-black p-2">
+            <div className="mb-1 text-xs font-bold text-gray-600">Uwagi na produkcję</div>
+            <div className="whitespace-pre-wrap text-sm">{order.productionComments}</div>
           </div>
         )}
 
         {/* Footer */}
-        <div className="mt-8 border-t-2 border-black pt-4 text-center text-sm text-gray-600">
-          <div>Utworzone przez: {order.createdBy?.name || "Nieznany"}</div>
-          <div className="mt-1">PG-ERP System</div>
+        <div className="mt-4 border-t-2 border-black pt-2 text-center text-xs text-gray-600">
+          <div>Utworzone przez: {order.createdBy?.name || "Nieznany"} · PG-ERP System</div>
         </div>
 
         {/* Print Button */}
