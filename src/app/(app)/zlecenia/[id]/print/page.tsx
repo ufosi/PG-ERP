@@ -31,15 +31,6 @@ export default function PrintOrderPage({ params }: { params: Promise<{ id: strin
     fetchOrder();
   }, [resolvedParams.id]);
 
-  const statusLabels: Record<string, string> = {
-    NEW: "Nowe",
-    IN_PROGRESS: "W toku",
-    COMPLETED: "Zrealizowane",
-    READY_FOR_PICKUP: "Gotowe do odbioru",
-    DONE: "Zakończone",
-    CANCELLED: "Anulowane",
-  };
-
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center text-black">Ładowanie...</div>;
   }
@@ -91,35 +82,31 @@ export default function PrintOrderPage({ params }: { params: Promise<{ id: strin
         </div>
 
         {/* Order Info */}
-        <div className="mb-6 grid grid-cols-2 gap-4 rounded-lg border-2 border-black p-4">
+        <div className="mb-4 grid grid-cols-2 gap-2 rounded-lg border-2 border-black p-3 text-sm">
           <div>
-            <div className="text-sm font-bold text-gray-600">Numer zlecenia</div>
-            <div className="text-xl font-mono font-bold">{order.number}</div>
+            <div className="text-xs font-bold text-gray-600">Numer zlecenia</div>
+            <div className="text-lg font-mono font-bold">{order.number}</div>
           </div>
           <div>
-            <div className="text-sm font-bold text-gray-600">Status</div>
-            <div className="text-xl font-bold">{statusLabels[order.status] || order.status}</div>
+            <div className="text-xs font-bold text-gray-600">Data utworzenia</div>
+            <div className="text-base">{formatDate(order.createdAt)}</div>
           </div>
           <div className="col-span-2">
-            <div className="text-sm font-bold text-gray-600">Nazwa zlecenia</div>
-            <div className="text-xl font-bold">{order.name}</div>
+            <div className="text-xs font-bold text-gray-600">Nazwa zlecenia</div>
+            <div className="text-lg font-bold">{order.name}</div>
           </div>
           {order.customer && (
             <div className="col-span-2">
-              <div className="text-sm font-bold text-gray-600">Klient</div>
-              <div className="text-xl">{order.customer}</div>
+              <div className="text-xs font-bold text-gray-600">Klient</div>
+              <div className="text-base">{order.customer}</div>
             </div>
           )}
           {order.dueDate && (
-            <div>
-              <div className="text-sm font-bold text-gray-600">Termin realizacji</div>
-              <div className="text-xl">{formatDate(order.dueDate)}</div>
+            <div className="col-span-2">
+              <div className="text-xs font-bold text-gray-600">Termin realizacji</div>
+              <div className="text-base">{formatDate(order.dueDate)}</div>
             </div>
           )}
-          <div>
-            <div className="text-sm font-bold text-gray-600">Data utworzenia</div>
-            <div className="text-xl">{formatDate(order.createdAt)}</div>
-          </div>
         </div>
 
         {/* Description */}
