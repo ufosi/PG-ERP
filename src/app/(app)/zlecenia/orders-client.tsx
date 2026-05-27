@@ -1,11 +1,11 @@
 ﻿"use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { format, parseISO } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import { AlertTriangle, CalendarDays, CheckCircle2, ChevronDown, ChevronUp, ClipboardList, Clock, Pencil, Plus, RotateCcw, Save, Square, Trash2, User, X } from "lucide-react";
+import { AlertTriangle, CalendarDays, CheckCircle2, ChevronDown, ChevronUp, ClipboardList, Clock, Pencil, Plus, RotateCcw, Save, Square, Trash2, User, X, Search } from "lucide-react";
 import { createProductionOrder, deleteProductionOrder, deleteWorkLog, forceStopWorkLog, setOrderStatus, stopWorkLog, updateOrderAssignees, updateProductionOrder, updateWorkLog } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1090,8 +1090,38 @@ export function OrdersClient({ orders, workers, userId, role, activeLogId, activ
     : undefined;
   const [showForm, setShowForm] = useState(searchParams.get("new") === "1");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [query, setQuery] = useState("");
   const canManage = role === "ADMIN" || role === "BIURO";
   const highlightedOrder = highlightedOrderId ? orders.find((order) => order.id === highlightedOrderId) : undefined;
+
+  const filteredOrders = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    let result = orders;
+
+    if (normalized) {
+      result = result.filter((order) => [
+        order.number,
+        order.name,
+        order.customer,
+        order.description,
+        order.status,
+        order.color,
+        order.photos,
+        order.projectDetails,
+        order.productionComments,
+        order.officeComments,
+        order.category?.name,
+        ...order.assignees.map((a) => a.name),
+        ...order.serviceOptions.map((s) => s.name),
+      ].filter(Boolean).some((value) => String(value).toLowerCase().includes(normalized)));
+    }
+
+    if (categoryFilter !== "all") {
+      result = result.filter((o) => (o.category?.id ?? "none") === categoryFilter || o.id === highlightedOrderId);
+    }
+
+    return result;
+  }, [orders, query, categoryFilter, highlightedOrderId]);
 
   useEffect(() => {
     if (!highlightedOrderId) return;
@@ -1100,7 +1130,6 @@ export function OrdersClient({ orders, workers, userId, role, activeLogId, activ
     }, 100);
   }, [highlightedOrderId]);
 
-  const filteredOrders = categoryFilter === "all" ? orders : orders.filter((o) => (o.category?.id ?? "none") === categoryFilter || o.id === highlightedOrderId);
   const active = filteredOrders.filter((o) => o.status === "OPEN" || o.status === "IN_PROGRESS");
   const done = filteredOrders.filter((o) => o.status === "DONE" || o.status === "CANCELLED");
   const longRunningLogs = orders.flatMap((order) =>
@@ -1127,6 +1156,12 @@ export function OrdersClient({ orders, workers, userId, role, activeLogId, activ
             Nowe zlecenie
           </Button>
         )}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+        <Search className="h-4 w-4 text-slate-500" />
+        <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Szukaj po numerze, nazwie, kliencie, statusie, przypisanych albo operacjach..." className="border-0 bg-transparent flex-1 min-w-64 focus-visible:ring-0" />
+        {query && <button type="button" onClick={() => setQuery("")} className="text-slate-500 hover:text-slate-200"><X className="h-4 w-4" /></button>}
       </div>
 
       <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/70 p-3">
