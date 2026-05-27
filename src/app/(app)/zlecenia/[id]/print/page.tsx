@@ -128,12 +128,15 @@ export default function PrintOrderPage({ params }: { params: Promise<{ id: strin
         {/* Service Options */}
         {order.serviceOptions.length > 0 && (
           <div className="mb-3 rounded-lg border-2 border-black p-2">
-            <div className="mb-1 text-xs font-bold text-gray-600">Operacje technologiczne</div>
-            <ul className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm list-inside list-disc">
+            <div className="mb-2 text-xs font-bold text-gray-600">Operacje technologiczne (czas w minutach)</div>
+            <div className="space-y-2">
               {order.serviceOptions.map((opt: { id: string; name: string }) => (
-                <li key={opt.id}>{opt.name}</li>
+                <div key={opt.id} className="flex items-center gap-2">
+                  <div className="flex-1 text-sm">{opt.name}</div>
+                  <div className="h-6 w-16 border-2 border-black"></div>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         )}
 
