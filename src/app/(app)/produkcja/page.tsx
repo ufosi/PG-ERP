@@ -2,12 +2,16 @@ import { requireUserSession } from "@/lib/auth-session";
 import { prisma } from "@/lib/prisma";
 import { isManager } from "@/types/roles";
 import { ProductionClient } from "./production-client";
+import { autoCloseLongRunningLogs } from "../zlecenia/actions";
 
 export default async function ProductionPage() {
   const session = await requireUserSession();
   const userId = session.user.id;
   const role = session.user.role;
   const manager = isManager(role);
+
+  // Auto-close long running logs (12+ hours)
+  await autoCloseLongRunningLogs();
 
   const [orders, categories] = await Promise.all([
     prisma.productionOrder.findMany({

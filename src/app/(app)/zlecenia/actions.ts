@@ -389,6 +389,30 @@ export async function forceStopWorkLog(formData: FormData) {
   revalidatePath("/zlecenia");
 }
 
+export async function autoCloseLongRunningLogs() {
+  const LONG_LOG_MS = 12 * 60 * 60 * 1000; // 12 hours
+  const cutoff = new Date(Date.now() - LONG_LOG_MS);
+
+  const result = await prisma.workLog.updateMany({
+    where: {
+      endedAt: null,
+      startedAt: { lt: cutoff },
+    },
+    data: {
+      endedAt: new Date(),
+      note: "Automatycznie zamknięte - przekroczono 12h",
+    },
+  });
+
+  if (result.count > 0) {
+    revalidatePath("/zlecenia");
+    revalidatePath("/produkcja");
+    revalidatePath("/dashboard");
+  }
+
+  return result;
+}
+
 export async function updateWorkLog(formData: FormData) {
   const session = await requireSession();
 
