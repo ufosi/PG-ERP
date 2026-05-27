@@ -31,11 +31,13 @@ function StatCard({
   value,
   icon: Icon,
   accent,
+  subtitle,
 }: {
   label: string;
   value: string;
   icon: typeof Activity;
   accent: string;
+  subtitle?: string;
 }) {
   return (
     <Card className="border-slate-800 bg-slate-900/70">
@@ -45,6 +47,7 @@ function StatCard({
       </CardHeader>
       <CardContent>
         <div className="text-3xl font-bold">{value}</div>
+        {subtitle && <div className="text-sm text-slate-400">{subtitle}</div>}
       </CardContent>
     </Card>
   );
@@ -207,6 +210,7 @@ export default async function DashboardPage() {
 
   const todayTotal = msToHm(sumMs(myLogsToday));
   const sessionsToday = myLogsToday.length;
+  const userName = session.user.name || "Nieznany";
 
   return (
     <div className="space-y-6">
@@ -216,6 +220,7 @@ export default async function DashboardPage() {
           value={activeLog ? "Pracuje" : "Wolny"}
           icon={PlayCircle}
           accent={activeLog ? "text-emerald-400" : "text-slate-400"}
+          subtitle={userName}
         />
         <StatCard label="Twój czas dziś" value={todayTotal} icon={Clock} accent="text-amber-400" />
         <StatCard label="Odbicia dziś" value={String(sessionsToday)} icon={Briefcase} accent="text-sky-400" />
