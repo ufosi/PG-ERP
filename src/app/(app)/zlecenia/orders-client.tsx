@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { format, parseISO } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import { AlertTriangle, CalendarDays, CheckCircle2, ChevronDown, ChevronUp, ClipboardList, Clock, Pencil, Plus, RotateCcw, Save, Square, Trash2, User, X, Search } from "lucide-react";
+import { AlertTriangle, CalendarDays, CheckCircle2, ChevronDown, ChevronUp, ClipboardList, Clock, Pencil, Plus, RotateCcw, Save, Square, Trash2, User, X, Search, Printer } from "lucide-react";
 import { createProductionOrder, deleteProductionOrder, deleteWorkLog, forceStopWorkLog, setOrderStatus, stopWorkLog, updateOrderAssignees, updateProductionOrder, updateWorkLog } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -788,6 +788,10 @@ function OrderCard({
               <Button size="sm" variant="outline" disabled={pending} onClick={() => { setErrorMsg(undefined); setEditingOrder(true); }} className="gap-1">
                 <Pencil className="h-3.5 w-3.5" />
                 Edytuj
+              </Button>
+              <Button size="sm" variant="outline" disabled={pending} onClick={() => window.open(`/zlecenia/${order.id}/print`, '_blank')} className="gap-1">
+                <Printer className="h-3.5 w-3.5" />
+                Drukuj
               </Button>
               <Button size="sm" variant="ghost" disabled={pending} onClick={handleDelete} className="gap-1 text-red-400 hover:text-red-300">
                 <Trash2 className="h-3.5 w-3.5" />
