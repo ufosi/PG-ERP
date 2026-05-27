@@ -136,14 +136,6 @@ export default async function PrintOrderPage({ params }: { params: { id: string 
           </div>
         )}
 
-        {/* Office Comments */}
-        {order.officeComments && (
-          <div className="mb-6 rounded-lg border-2 border-black p-4">
-            <div className="mb-2 text-sm font-bold text-gray-600">Komentarze biura</div>
-            <div className="whitespace-pre-wrap text-base">{order.officeComments}</div>
-          </div>
-        )}
-
         {/* Assigned Workers */}
         {order.assignees.length > 0 && (
           <div className="mb-6 rounded-lg border-2 border-black p-4">
@@ -155,40 +147,6 @@ export default async function PrintOrderPage({ params }: { params: { id: string 
                 </li>
               ))}
             </ul>
-          </div>
-        )}
-
-        {/* Work Logs */}
-        {order.workLogs.length > 0 && (
-          <div className="mb-6 rounded-lg border-2 border-black p-4">
-            <div className="mb-2 text-sm font-bold text-gray-600">Historia pracy</div>
-            <table className="w-full border-collapse border border-black text-sm">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="border border-black p-2 text-left">Pracownik</th>
-                  <th className="border border-black p-2 text-left">Start</th>
-                  <th className="border border-black p-2 text-left">Koniec</th>
-                  <th className="border border-black p-2 text-left">Czas (min)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {order.workLogs.map((log) => {
-                  const end = log.endedAt ?? new Date();
-                  const ms = end.getTime() - new Date(log.startedAt).getTime();
-                  const minutes = Math.max(0, Math.floor(ms / 60000));
-                  return (
-                    <tr key={log.id}>
-                      <td className="border border-black p-2">{log.user.name}</td>
-                      <td className="border border-black p-2">{formatDate(log.startedAt)}</td>
-                      <td className="border border-black p-2">
-                        {log.endedAt ? formatDate(log.endedAt) : "w trakcie"}
-                      </td>
-                      <td className="border border-black p-2">{minutes}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
           </div>
         )}
 
