@@ -178,7 +178,7 @@ export function ReportsClient({ from, to, view, totalMs, totalSessions, byUser, 
             </p>
           </div>
         </div>
-        <a href={csvHref}>
+        <a href={csvHref} download={`raport_${toDateInputValue(from)}_${toDateInputValue(to)}.csv`}>
           <Button variant="outline" className="gap-2">
             <Download className="h-4 w-4" />
             Eksport CSV
