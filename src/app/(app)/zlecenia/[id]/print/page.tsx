@@ -53,22 +53,28 @@ export default function PrintOrderPage({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <div className="min-h-screen bg-white p-8 text-black print:p-4">
+    <div className="min-h-screen bg-white p-8 text-black print:p-4 print:bg-white print:text-black">
       <style jsx global>{`
         @media print {
-          body * {
-            visibility: hidden;
+          body {
+            background: white !important;
           }
-          .min-h-screen, .min-h-screen * {
-            visibility: visible;
+          header, nav, .sidebar, .navbar, [role="navigation"] {
+            display: none !important;
+            visibility: hidden !important;
+          }
+          body > *:not(.min-h-screen) {
+            display: none !important;
           }
           .min-h-screen {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            margin: 0;
-            padding: 20px;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 20px !important;
+            background: white !important;
+            color: black !important;
           }
           @page {
             margin: 1cm;
