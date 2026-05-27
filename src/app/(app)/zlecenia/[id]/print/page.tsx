@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { formatDate } from "@/lib/time";
 
-export default function PrintOrderPage({ params }: { params: { id: string } }) {
+export default function PrintOrderPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -11,7 +12,7 @@ export default function PrintOrderPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     async function fetchOrder() {
       try {
-        const response = await fetch(`/api/orders/${params.id}/print`);
+        const response = await fetch(`/api/orders/${resolvedParams.id}/print`);
         if (!response.ok) {
           throw new Error("Failed to fetch order");
         }
@@ -25,7 +26,7 @@ export default function PrintOrderPage({ params }: { params: { id: string } }) {
     }
 
     fetchOrder();
-  }, [params.id]);
+  }, [resolvedParams.id]);
 
   const statusLabels: Record<string, string> = {
     NEW: "Nowe",
