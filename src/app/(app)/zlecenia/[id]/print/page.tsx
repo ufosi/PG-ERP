@@ -54,6 +54,27 @@ export default function PrintOrderPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div className="min-h-screen bg-white p-8 text-black print:p-4">
+      <style jsx global>{`
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          .min-h-screen, .min-h-screen * {
+            visibility: visible;
+          }
+          .min-h-screen {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0;
+            padding: 20px;
+          }
+          @page {
+            margin: 1cm;
+          }
+        }
+      `}</style>
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-8 border-b-2 border-black pb-4">
@@ -144,20 +165,6 @@ export default function PrintOrderPage({ params }: { params: Promise<{ id: strin
           <div className="mb-6 rounded-lg border-2 border-black p-4">
             <div className="mb-2 text-sm font-bold text-gray-600">Komentarze produkcji</div>
             <div className="whitespace-pre-wrap text-base">{order.productionComments}</div>
-          </div>
-        )}
-
-        {/* Assigned Workers */}
-        {order.assignees.length > 0 && (
-          <div className="mb-6 rounded-lg border-2 border-black p-4">
-            <div className="mb-2 text-sm font-bold text-gray-600">Przypisani pracownicy</div>
-            <ul className="list-inside list-disc text-base">
-              {order.assignees.map((worker: { id: string; name: string; role: string }) => (
-                <li key={worker.id}>
-                  {worker.name} ({worker.role})
-                </li>
-              ))}
-            </ul>
           </div>
         )}
 
