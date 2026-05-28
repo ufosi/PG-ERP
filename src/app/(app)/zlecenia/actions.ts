@@ -407,12 +407,6 @@ export async function autoCloseLongRunningLogs() {
     },
   });
 
-  if (result.count > 0) {
-    revalidatePath("/zlecenia");
-    revalidatePath("/produkcja");
-    revalidatePath("/dashboard");
-  }
-
   return result;
 }
 
